@@ -11,7 +11,11 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "HarianKu - Rencanakan Hari, Hidup Teratur",
   description: "Aplikasi mobile-first untuk mencatat meal plan, stok dapur, dan olahraga harian.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
+
 
 export default function RootLayout({
   children,
