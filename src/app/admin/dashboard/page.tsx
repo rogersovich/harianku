@@ -94,7 +94,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col p-6 space-y-6 bg-bg-warm min-h-screen">
+    <div className="flex-1 flex flex-col p-6 pb-16 space-y-6">
       {/* Header */}
       <header className="flex justify-between items-center border-b border-border-subtle pb-4">
         <div>

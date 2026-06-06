@@ -61,7 +61,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="flex-1 p-6 space-y-6 bg-bg-warm min-h-screen">
+    <div className="flex-1 p-6 pb-16 space-y-6">
       {/* Header */}
       <header className="border-b border-border-subtle pb-4 flex justify-between items-center">
         <div>

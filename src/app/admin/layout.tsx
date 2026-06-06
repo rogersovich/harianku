@@ -31,10 +31,9 @@ export default async function AdminLayout({
       <AdminSidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 h-screen overflow-y-auto flex flex-col">
+      <main className="flex-1 h-screen overflow-y-auto flex flex-col bg-bg-warm">
         {children}
       </main>
     </div>
   )
 }
-

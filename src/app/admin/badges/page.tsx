@@ -151,7 +151,7 @@ export default function AdminBadgesPage() {
   }, {} as Record<string, Badge[]>)
 
   return (
-    <div className="flex-1 p-6 space-y-6 bg-bg-warm min-h-screen">
+    <div className="flex-1 p-6 pb-16 space-y-6">
       {/* Header */}
       <header className="border-b border-border-subtle pb-4">
         <h1 className="text-lg font-bold text-text-primary flex items-center gap-1.5">
@@ -162,7 +162,8 @@ export default function AdminBadgesPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left Column - Form */}
-        <div className="lg:col-span-1 space-y-4">
+        <div className="lg:col-span-1 space-y-4 lg:sticky lg:top-6">
+
           <Card className="p-5 bg-white border-border-subtle shadow-pink-subtle relative">
             {editingId && (
               <button
