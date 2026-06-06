@@ -36,7 +36,7 @@ export async function GET() {
           is_primary
         )
       `)
-      .or(`user_id.eq.${user.id},is_starter.eq.true`)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
     if (error) {
