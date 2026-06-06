@@ -118,11 +118,12 @@ export default function AdminRecipesPage() {
     try {
       const [resRecipes, resCategories] = await Promise.all([
         fetch('/api/admin/resep'),
-        fetch('/api/kategori')
+        fetch('/api/admin/categories')
       ])
 
       const dataRecipes = await resRecipes.json()
       const dataCategories = await resCategories.json()
+
 
       if (resRecipes.ok) setRecipes(dataRecipes)
       if (resCategories.ok) setCategories(dataCategories)
