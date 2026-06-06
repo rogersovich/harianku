@@ -154,7 +154,7 @@ export default function DashboardPage() {
   const goal = data?.profile?.goal || 'keduanya'
   
   const slotLabels = {
-    sarapan: { label: 'Sarapan', icon: '🌅' },
+    sarapan: { label: 'Sarapan', icon: '🥞' },
     makan_siang: { label: 'Makan Siang', icon: '☀️' },
     makan_malam: { label: 'Makan Malam', icon: '🌙' },
     camilan: { label: 'Camilan', icon: '🍰' }

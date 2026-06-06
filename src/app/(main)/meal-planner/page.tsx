@@ -251,7 +251,8 @@ export default function MealPlannerPage() {
       const height = downloadAreaRef.current.offsetHeight || (shareFormat === 'story' ? 640 : 360)
 
       const dataUrl = await htmlToImage.toPng(downloadAreaRef.current, {
-        quality: 0.95,
+        quality: 1,
+        pixelRatio: 3, // Meningkatkan resolusi gambar hasil ekspor menjadi 3x (960px lebar) agar tidak pecah/blur
         backgroundColor: '#FFF8FB',
         width: width,
         height: height,
@@ -276,7 +277,7 @@ export default function MealPlannerPage() {
   }
 
   const slotLabels = {
-    sarapan: '🌅 Sarapan',
+    sarapan: '🥞 Sarapan',
     makan_siang: '☀️ Siang',
     makan_malam: '🌙 Malam',
     camilan: '🍰 Camilan'

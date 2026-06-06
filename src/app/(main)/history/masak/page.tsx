@@ -45,7 +45,7 @@ export default function CookingHistoryPage() {
   }, [])
 
   const slotLabels: { [key: string]: { label: string; color: string } } = {
-    sarapan: { label: '🌅 Sarapan', color: 'bg-amber-50 text-amber-600 border-amber-200' },
+    sarapan: { label: '🥞 Sarapan', color: 'bg-amber-50 text-amber-600 border-amber-200' },
     makan_siang: { label: '☀️ Makan Siang', color: 'bg-sky-50 text-sky-600 border-sky-200' },
     makan_malam: { label: '🌙 Makan Malam', color: 'bg-indigo-50 text-indigo-600 border-indigo-200' },
     camilan: { label: '🍪 Camilan', color: 'bg-rose-50 text-rose-600 border-rose-200' }

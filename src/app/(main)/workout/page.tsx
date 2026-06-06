@@ -11,7 +11,7 @@ import {
 } from '@/lib/utils/date'
 import { 
   ChevronLeft, ChevronRight, Dumbbell, Award, 
-  CheckCircle2, Plus, Camera, X, RefreshCw 
+  CheckCircle2, Plus, Camera, X, RefreshCw, Info
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -43,6 +43,7 @@ export default function WorkoutPage() {
   const [newTarget, setNewTarget] = useState('3')
 
   const [saving, setSaving] = useState(false)
+  const [activePhotoUrl, setActivePhotoUrl] = useState<string | null>(null)
 
   const { start: mondayStr, end: sundayStr, mondayObject } = getWeekStartAndEnd(currentWeekDate)
 
@@ -97,6 +98,11 @@ export default function WorkoutPage() {
   }
 
   const handleOpenComplete = (dateStr: string, type: 'jogging' | 'gym' | 'rumah') => {
+    const todayStr = getWIBDateString(new Date())
+    if (dateStr !== todayStr) {
+      toast.warning('Bukti olahraga hanya dapat diunggah pada hari-H jadwal tersebut!')
+      return
+    }
     setCompletingDate(dateStr)
     setCompletingType(type)
     setNotes('')
@@ -174,6 +180,7 @@ export default function WorkoutPage() {
     { num: 7, name: 'Minggu' }
   ]
 
+  const todayStr = getWIBDateString(new Date())
   const completedCount = logs.filter(l => l.is_completed).length
   const weeklyTarget = profile?.workout_target_weekly || 3
 
@@ -248,11 +255,20 @@ export default function WorkoutPage() {
         </div>
       ) : (
         <section className="space-y-3">
+          {/* Info Banner */}
+          <div className="bg-primary-light/10 border border-primary/20 rounded-xl p-3 flex items-start gap-2.5">
+            <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <p className="text-[10px] text-text-secondary leading-relaxed">
+              <strong>Info Pengunggahan Bukti:</strong> Foto bukti olahraga hanya dapat diunggah pada hari-H jadwal tersebut untuk menjaga keaslian dan melatih kedisiplinan harian Anda.
+            </p>
+          </div>
+
           {daysOfWeek.map((day) => {
             const dayDate = new Date(mondayObject)
             dayDate.setDate(mondayObject.getDate() + (day.num - 1))
             const dayDateStr = getWIBDateString(dayDate)
             const log = logs.find(l => l.date === dayDateStr)
+            const isToday = dayDateStr === todayStr
 
             return (
               <Card key={day.num} className="flex justify-between items-center p-3.5">
@@ -277,13 +293,17 @@ export default function WorkoutPage() {
                         </p>
                       )}
                       {log.proof_photo_url && (
-                        <div className="w-12 h-12 rounded-lg bg-surface-alt border border-border-subtle overflow-hidden relative shadow-inner">
+                        <button
+                          type="button"
+                          onClick={() => setActivePhotoUrl(log.proof_photo_url)}
+                          className="w-12 h-12 rounded-lg bg-surface-alt border border-border-subtle overflow-hidden relative shadow-inner cursor-pointer active:scale-95 transition-transform block"
+                        >
                           <img 
                             src={log.proof_photo_url} 
                             alt="Workout proof" 
                             className="w-full h-full object-cover" 
                           />
-                        </div>
+                        </button>
                       )}
                     </div>
                   ) : (
@@ -300,7 +320,11 @@ export default function WorkoutPage() {
                     ) : (
                       <button
                         onClick={() => handleOpenComplete(dayDateStr, log.type)}
-                        className="h-8 px-3.5 rounded-full text-xs font-bold bg-accent text-white hover:opacity-90 active:scale-95 transition-all cursor-pointer flex items-center gap-1"
+                        className={`h-8 px-3.5 rounded-full text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
+                          isToday
+                            ? 'bg-accent text-white hover:opacity-90 active:scale-95'
+                            : 'bg-border-subtle text-text-disabled cursor-not-allowed opacity-60'
+                        }`}
                       >
                         <Camera className="w-3.5 h-3.5" /> Bukti
                       </button>
@@ -444,6 +468,32 @@ export default function WorkoutPage() {
           </Button>
         </form>
       </Drawer>
+
+      {/* Lightbox / Image Preview Modal */}
+      {activePhotoUrl && (
+        <div 
+          className="fixed inset-0 bg-black/85 z-55 flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setActivePhotoUrl(null)}
+        >
+          <div className="relative max-w-full max-h-[85vh] rounded-2xl overflow-hidden shadow-2xl bg-black/50 flex items-center justify-center">
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setActivePhotoUrl(null)
+              }}
+              className="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white rounded-full p-2 cursor-pointer transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <img
+              src={activePhotoUrl}
+              alt="Bukti Olahraga Preview"
+              className="max-w-full max-h-[85vh] object-contain rounded-xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

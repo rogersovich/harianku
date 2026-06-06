@@ -56,6 +56,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Parameter tidak lengkap' }, { status: 400 })
     }
 
+    // Validasi agar hanya bisa unggah bukti/menyelesaikan workout pada hari-H
+    if (is_completed) {
+      const todayStr = getWIBDateString(new Date())
+      if (date !== todayStr) {
+        return NextResponse.json({ error: 'Bukti olahraga hanya dapat diunggah pada hari-H!' }, { status: 400 })
+      }
+    }
+
     // Check if workout log already exists for date
     const { data: existing } = await supabase
       .from('workout_logs')

@@ -377,6 +377,13 @@ export default function StockPage() {
                           <p className="text-[11px] text-text-secondary mt-0.5">
                             Sisa: <span className="font-extrabold text-red-500">{item.amount} {item.unit}</span> / batas: {item.threshold_amount} {item.unit}
                           </p>
+                          {item.price_per_unit !== null && item.price_per_unit > 0 && (
+                            <div className="flex gap-2 text-[10px] text-text-secondary mt-1 font-medium">
+                              <span>Harga: Rp {item.price_per_unit.toLocaleString('id-ID')}/{item.unit}</span>
+                              <span className="text-text-disabled">•</span>
+                              <span>Total: Rp {(item.price_per_unit * item.amount).toLocaleString('id-ID')}</span>
+                            </div>
+                          )}
                         </div>
                         <Edit2 className="w-4 h-4 text-red-400 shrink-0" />
                       </Card>
@@ -403,6 +410,13 @@ export default function StockPage() {
                           <p className="text-[11px] text-text-secondary mt-0.5">
                             Sisa: <span className="font-bold text-text-primary">{item.amount} {item.unit}</span>
                           </p>
+                          {item.price_per_unit !== null && item.price_per_unit > 0 && (
+                            <div className="flex gap-2 text-[10px] text-text-secondary mt-1 font-medium">
+                              <span>Harga: Rp {item.price_per_unit.toLocaleString('id-ID')}/{item.unit}</span>
+                              <span className="text-text-disabled">•</span>
+                              <span>Total: Rp {(item.price_per_unit * item.amount).toLocaleString('id-ID')}</span>
+                            </div>
+                          )}
                         </div>
                         <Edit2 className="w-4 h-4 text-text-disabled shrink-0" />
                       </Card>
