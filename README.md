@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍽️ HarianKu
+> **Web App Mobile-First untuk Konsistensi Hidup Sehat & Teratur**
 
-## Getting Started
+**HarianKu** adalah aplikasi web berbasis *mobile-first* yang dirancang untuk membantu Anda menjalani rutinitas harian dengan lebih terencana dan menyenangkan. Dari merencanakan menu masak mingguan, mengelola stok dapur secara otomatis, hingga mencatat aktivitas olahraga harian demi mempertahankan *streak* mingguan Anda.
 
-First, run the development server:
+---
 
+## 🌟 Fitur Utama
+
+- **Onboarding Cerdas**: Memandu pengguna baru menentukan preferensi hidup sehat (*Makan Sehat*, *Aktif Olahraga*, atau keduanya) disertai 10+ resep bawaan (starter recipes).
+- **Meal Planner Mingguan**: Susun agenda makanan mingguan (Sarapan, Makan Siang, Makan Malam, Camilan) dengan antarmuka yang bersih dan interaktif.
+- **Stok Dapur & Pengurangan Otomatis**: Kelola persediaan bahan makanan di rumah. Saat Anda menandai resep sebagai "Sudah Dimasak", stok bahan dalam resep tersebut otomatis berkurang.
+- **Catatan Belanja Pintar**: Menghitung secara agregat kebutuhan bahan makanan untuk minggu ini secara otomatis dengan membandingkan rencana menu makan terhadap sisa stok dapur.
+- **Workout Tracker**: Jadwalkan sesi olahraga mingguan dan pertahankan streak dengan mengunggah foto bukti aktivitas Anda.
+- **Sistem Motivasi & Streak**: Dapatkan lencana pencapaian (badges) dan klaim hadiah mingguan yang menarik saat Anda menjaga konsistensi.
+- **Panduan Pengguna Interaktif (Tour Guide)**: Bantuan langkah-demi-langkah interaktif menggunakan **Driver.js** saat pertama kali menggunakan dasbor.
+- **Panel Admin Lengkap**: Panel khusus admin untuk mengelola user, melihat statistik, mengatur hadiah, memantau resep starter, serta mengonfigurasi kategori bawaan.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16 (App Router, Turbopack)
+- **Bahasa**: TypeScript
+- **Styling**: TailwindCSS & Custom CSS
+- **Database & Auth**: Supabase (PostgreSQL, Supabase Auth, Supabase Storage)
+- **Animasi & Interaktivitas**: Framer Motion, Canvas Confetti
+- **Panduan/Tour**: Driver.js (dengan tema khusus HarianKu)
+- **Komponen & Ikon**: Lucide React, Sonner (Toaster)
+
+---
+
+## 🚀 Memulai Pengembangan
+
+### Prasyarat
+Pastikan Anda menggunakan Node.js versi 20 ke atas. Jika menggunakan `nvm`, jalankan:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+nvm use 20
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 1. Kloning Proyek & Instalasi Dependensi
+```bash
+git clone <url-repositori-harianku>
+cd harianku
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 2. Konfigurasi Environment Variables
+Buat file `.env` di direktori utama proyek Anda dan isi variabel berikut:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Jalankan Server Development
+Jalankan server lokal dengan Next Turbopack:
+```bash
+npm run dev
+```
+Buka [http://localhost:3000](http://localhost:3000) di browser Anda untuk melihat hasilnya.
 
-## Learn More
+### 4. Build Produksi
+Untuk memeriksa kesiapan kode dan membuat bundel produksi:
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📂 Struktur Proyek
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```text
+src/
+├── app/                  # Next.js App Router (Halaman & API Routes)
+│   ├── (auth)/           # Halaman login, signup, dan onboarding
+│   ├── (main)/           # Modul dashboard, resep, stok, planner, workout, dan profil
+│   ├── admin/            # Dashboard dan kontrol panel administrator
+│   ├── api/              # Endpoint API backend (Supabase database operations)
+│   ├── layout.tsx        # Layout root
+│   └── page.tsx          # Landing page
+├── components/           # Reusable UI Components
+│   └── ui/               # Komponen kustom (CustomComponents, BottomNav, dll)
+├── lib/                  # Helper fungsi, utils, dan integrasi API
+│   ├── quotes.ts         # Koleksi kata motivasi harian
+│   └── supabase/         # Inisialisasi client & server Supabase
+└── public/               # Static assets (gambar, ikon, logo)
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📝 Kontribusi
+1. Lakukan *fork* pada repositori ini.
+2. Buat *branch* fitur baru Anda (`git checkout -b fitur/fitur-baru`).
+3. Commit perubahan Anda (`git commit -m 'Menambahkan fitur baru'`).
+4. Push ke branch tersebut (`git push origin fitur/fitur-baru`).
+5. Buat *Pull Request*.
