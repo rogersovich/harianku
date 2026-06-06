@@ -143,6 +143,13 @@ export default function AdminBadgesPage() {
     )
   }
 
+  const groupedBadges = badges.reduce((acc, badge) => {
+    const type = badge.trigger_type || 'recipes_created'
+    if (!acc[type]) acc[type] = []
+    acc[type].push(badge)
+    return acc
+  }, {} as Record<string, Badge[]>)
+
   return (
     <div className="flex-1 p-6 space-y-6 bg-bg-warm min-h-screen">
       {/* Header */}
@@ -156,7 +163,7 @@ export default function AdminBadgesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left Column - Form */}
         <div className="lg:col-span-1 space-y-4">
-          <Card className="p-5 bg-white border-border-subtle shadow-sm relative">
+          <Card className="p-5 bg-white border-border-subtle shadow-pink-subtle relative">
             {editingId && (
               <button
                 onClick={resetForm}
@@ -251,52 +258,67 @@ export default function AdminBadgesPage() {
         </div>
 
         {/* Right Column - Badges List */}
-        <div className="lg:col-span-2 space-y-3">
+        <div className="lg:col-span-2 space-y-6">
           <h2 className="text-xs font-bold text-text-secondary uppercase tracking-wider">Daftar Badge Tersedia ({badges.length})</h2>
 
           {badges.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {badges.map((badge) => (
-                <Card 
-                  key={badge.id}
-                  className={`p-4 bg-white border-border-subtle shadow-sm flex flex-col justify-between transition-all ${
-                    editingId === badge.id ? 'ring-2 ring-primary/70 border-transparent' : ''
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 rounded-full bg-primary-light/30 flex items-center justify-center text-3xl shrink-0">
-                      {badge.icon}
-                    </div>
-                    <div className="min-w-0">
-                      <h4 className="text-xs font-bold text-text-primary truncate">{badge.name}</h4>
-                      <p className="text-[10px] text-text-secondary mt-1 leading-relaxed line-clamp-2">
-                        {badge.description}
-                      </p>
-                      <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-alt text-text-secondary text-[9px] font-bold">
-                        <span>🎯 {TRIGGER_LABELS[badge.trigger_type] || badge.trigger_type}:</span>
-                        <span className="text-primary">{badge.trigger_value}</span>
-                      </div>
-                    </div>
-                  </div>
+            <div className="space-y-6">
+              {Object.keys(TRIGGER_LABELS).map((type) => {
+                const badgeList = groupedBadges[type] || []
+                if (badgeList.length === 0) return null
 
-                  <div className="flex justify-end gap-2 border-t border-border-subtle/50 mt-4 pt-2.5">
-                    <button
-                      onClick={() => handleEditInit(badge)}
-                      className="p-1.5 rounded-md hover:bg-primary-light/30 text-text-secondary hover:text-primary cursor-pointer transition-colors"
-                      title="Edit Badge"
-                    >
-                      <Edit2 className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(badge.id)}
-                      className="p-1.5 rounded-md hover:bg-red-50 text-text-secondary hover:text-danger cursor-pointer transition-colors"
-                      title="Hapus Badge"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                return (
+                  <div key={type} className="space-y-3">
+                    <h3 className="text-xs font-bold text-text-primary uppercase tracking-wider border-b border-border-subtle pb-1.5 flex justify-between items-center">
+                      <span>🎯 {TRIGGER_LABELS[type]}</span>
+                      <span className="text-[10px] text-primary bg-primary-light/45 px-2.5 py-0.5 rounded-full font-black">{badgeList.length} Badge</span>
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {badgeList.map((badge) => (
+                        <Card 
+                          key={badge.id}
+                          className={`p-4 bg-white border-border-subtle shadow-pink-subtle flex flex-col justify-between transition-all ${
+                            editingId === badge.id ? 'ring-2 ring-primary/70 border-transparent' : ''
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-12 h-12 rounded-full bg-primary-light/30 flex items-center justify-center text-3xl shrink-0">
+                              {badge.icon}
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-bold text-text-primary truncate">{badge.name}</h4>
+                              <p className="text-[10px] text-text-secondary mt-1 leading-relaxed line-clamp-2">
+                                {badge.description}
+                              </p>
+                              <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-surface-alt text-text-secondary text-[9px] font-bold">
+                                <span>🎯 {TRIGGER_LABELS[badge.trigger_type] || badge.trigger_type}:</span>
+                                <span className="text-primary">{badge.trigger_value}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-end gap-2 border-t border-border-subtle/50 mt-4 pt-2.5">
+                            <button
+                              onClick={() => handleEditInit(badge)}
+                              className="p-1.5 rounded-md hover:bg-primary-light/30 text-text-secondary hover:text-primary cursor-pointer transition-colors"
+                              title="Edit Badge"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(badge.id)}
+                              className="p-1.5 rounded-md hover:bg-red-50 text-text-secondary hover:text-danger cursor-pointer transition-colors"
+                              title="Hapus Badge"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
                   </div>
-                </Card>
-              ))}
+                )
+              })}
             </div>
           ) : (
             <div className="border border-dashed border-border-subtle bg-white rounded-xl py-12 px-4 text-center">
@@ -310,3 +332,4 @@ export default function AdminBadgesPage() {
     </div>
   )
 }
+
