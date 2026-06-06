@@ -12,6 +12,8 @@ import {
   Camera, X
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { driver } from 'driver.js'
+import 'driver.js/dist/driver.css'
 
 interface MealSlot {
   id: string
@@ -85,6 +87,90 @@ export default function DashboardPage() {
     fetchDashboardData()
     setQuote(getRandomQuote())
   }, [])
+
+  useEffect(() => {
+    if (!loading && data) {
+      const tourCompleted = localStorage.getItem('harianku_dashboard_tour_completed')
+      if (!tourCompleted) {
+        const timer = setTimeout(() => {
+          const driverObj = driver({
+            showProgress: true,
+            animate: true,
+            popoverClass: 'driverjs-theme',
+            progressText: '{{current}} dari {{total}}',
+            nextBtnText: 'Lanjut 👉',
+            prevBtnText: '👈 Kembali',
+            doneBtnText: 'Selesai 🎉',
+            allowClose: true,
+            steps: [
+              {
+                popover: {
+                  title: 'Selamat Datang di HarianKu! 👋',
+                  description: 'Mari kami kelilingi sebentar untuk mengenalkan fitur-fitur keren yang siap membantumu konsisten hidup sehat.',
+                }
+              },
+              {
+                element: '#tour-streaks',
+                popover: {
+                  title: '🔥 Konsistensi Streak',
+                  description: 'Lihat streak memasak dan olahraga mingguanmu di sini. Jaga apinya agar tidak padam untuk membangun kebiasaan baru!',
+                  side: 'bottom' as const,
+                  align: 'start' as const
+                }
+              },
+              {
+                element: '#tour-shortcuts',
+                popover: {
+                  title: '⚡ Akses Cepat',
+                  description: 'Akses cepat ke database Resep, Meal Planner, Stok Dapur, dan Catatan Belanja Anda dalam sekali ketuk.',
+                  side: 'bottom' as const,
+                  align: 'start' as const
+                }
+              },
+              {
+                element: '#tour-menu',
+                popover: {
+                  title: '🍳 Menu Hari Ini',
+                  description: 'Menu makan yang sudah Anda jadwalkan untuk hari ini. Jangan lupa ketuk "Tandai Dimasak" setelah selesai memasak untuk otomatis mengurangi stok dapur Anda!',
+                  side: 'top' as const,
+                  align: 'start' as const
+                }
+              },
+              ...(data?.profile?.goal !== 'makan_sehat' ? [{
+                element: '#tour-workout',
+                popover: {
+                  title: '🏃 Laporan Olahraga',
+                  description: 'Jadwalkan olahraga harianmu dan unggah foto bukti kegiatan untuk mempertahankan streak olahragamu!',
+                  side: 'top' as const,
+                  align: 'start' as const
+                }
+              }] : []),
+              {
+                element: '#tour-notes',
+                popover: {
+                  title: '📝 Catatan Harian',
+                  description: 'Tulis ide resep dadakan, catatan rasa masakan, atau evaluasi harianmu di sini. Otomatis tersimpan saat Anda selesai mengetik.',
+                  side: 'top' as const,
+                  align: 'start' as const
+                }
+              },
+              {
+                popover: {
+                  title: 'Mulai Petualanganmu! 🚀',
+                  description: 'Sekarang Anda siap mengelola hidangan sehat dan olahraga harian dengan HarianKu. Selamat mencoba!',
+                }
+              }
+            ],
+            onDestroyed: () => {
+              localStorage.setItem('harianku_dashboard_tour_completed', 'true')
+            }
+          })
+          driverObj.drive()
+        }, 800)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [loading, data])
 
   const handleMarkAsCooked = async (slotId: string, resultPhotoUrl?: string) => {
     setMarkingCooked(true)
@@ -191,7 +277,7 @@ export default function DashboardPage() {
       </header>
 
       {/* Streak Counters */}
-      <section className="flex gap-3">
+      <section id="tour-streaks" className="flex gap-3">
         <StreakCounter type="masak" count={data?.streak?.cooking_streak || 0} />
         {showWorkout && (
           <StreakCounter 
@@ -203,7 +289,7 @@ export default function DashboardPage() {
       </section>
 
       {/* Fast Shortcuts */}
-      <section className="grid grid-cols-4 gap-2">
+      <section id="tour-shortcuts" className="grid grid-cols-4 gap-2">
         <Link href="/resep" className="flex flex-col items-center p-2.5 bg-white rounded-xl border border-border-subtle shadow-pink-subtle active:scale-95 transition-all text-center">
           <BookOpen className="w-5 h-5 text-primary mb-1" />
           <span className="text-[10px] font-bold text-text-primary">Resep</span>
@@ -223,7 +309,7 @@ export default function DashboardPage() {
       </section>
 
       {/* Menu Hari Ini */}
-      <section className="space-y-3">
+      <section id="tour-menu" className="space-y-3">
         <div className="flex justify-between items-center">
           <h2 className="text-sm font-bold text-text-primary flex items-center gap-1.5">
             <span className="mr-1">🍽️</span> Menu Hari Ini
@@ -296,7 +382,7 @@ export default function DashboardPage() {
 
       {/* Workout Hari Ini */}
       {showWorkout && (
-        <section className="space-y-3">
+        <section id="tour-workout" className="space-y-3">
           <div className="flex justify-between items-center">
             <h2 className="text-sm font-bold text-text-primary flex items-center gap-1.5">
               🏃 Workout Hari Ini
@@ -361,7 +447,7 @@ export default function DashboardPage() {
       </section>
 
       {/* Catatan Harian */}
-      <section className="space-y-2">
+      <section id="tour-notes" className="space-y-2">
         <h2 className="text-xs font-bold text-text-secondary uppercase tracking-wider">
           📝 Catatan Hari Ini
         </h2>

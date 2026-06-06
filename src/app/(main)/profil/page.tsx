@@ -118,6 +118,14 @@ export default function ProfilePage() {
     }
   }
 
+  const handleResetTour = () => {
+    localStorage.removeItem('harianku_dashboard_tour_completed')
+    toast.success('Panduan aplikasi diatur ulang! Mengalihkan ke Dashboard... 🚀')
+    setTimeout(() => {
+      router.push('/dashboard')
+    }, 1000)
+  }
+
   if (loading) {
     return (
       <div className="flex-1 flex flex-col justify-center items-center min-h-[80vh] gap-3">
@@ -193,6 +201,22 @@ export default function ProfilePage() {
           </button>
         </Card>
       )}
+
+      {/* Replay Tour Guide */}
+      <Card className="p-4 bg-white flex justify-between items-center shadow-pink-subtle border-border-subtle">
+        <div className="space-y-0.5">
+          <h3 className="text-xs font-bold text-text-primary flex items-center gap-1.5">
+            🧭 Panduan Aplikasi
+          </h3>
+          <p className="text-[10px] text-text-secondary">Ulangi penjelasan interaktif seputar fitur HarianKu.</p>
+        </div>
+        <button
+          onClick={handleResetTour}
+          className="h-8 px-4 bg-primary-light text-primary hover:opacity-90 active:scale-95 rounded-full text-xs font-bold flex items-center justify-center transition-all cursor-pointer"
+        >
+          Mulai Panduan
+        </button>
+      </Card>
 
       {/* Streak Logs */}
       <section className="space-y-2.5">
