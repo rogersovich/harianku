@@ -62,20 +62,20 @@ export async function GET() {
       if (earnedBadgeIds.has(badge.id)) continue
 
       let eligible = false
-      const criteriaVal = Number(badge.criteria_value || 0)
+      const triggerVal = Number(badge.trigger_value || 0)
 
-      switch (badge.criteria_type) {
+      switch (badge.trigger_type) {
         case 'recipes_created':
-          eligible = (recipeCount || 0) >= criteriaVal
+          eligible = (recipeCount || 0) >= triggerVal
           break
         case 'meals_cooked':
-          eligible = (cookedCount || 0) >= criteriaVal
+          eligible = (cookedCount || 0) >= triggerVal
           break
         case 'workouts_completed':
-          eligible = (workoutCount || 0) >= criteriaVal
+          eligible = (workoutCount || 0) >= triggerVal
           break
         case 'stock_items_count':
-          eligible = (stockCount || 0) >= criteriaVal
+          eligible = (stockCount || 0) >= triggerVal
           break
       }
 
@@ -105,18 +105,18 @@ export async function GET() {
       
       // Dynamic unlock condition hint
       let hint = ''
-      switch (badge.criteria_type) {
+      switch (badge.trigger_type) {
         case 'recipes_created':
-          hint = `Buat minimal ${badge.criteria_value} resep pribadi`
+          hint = `Buat minimal ${badge.trigger_value} resep pribadi`
           break
         case 'meals_cooked':
-          hint = `Masak resep dari plan sebanyak ${badge.criteria_value} kali`
+          hint = `Masak resep dari plan sebanyak ${badge.trigger_value} kali`
           break
         case 'workouts_completed':
-          hint = `Selesaikan minimal ${badge.criteria_value} kali olahraga`
+          hint = `Selesaikan minimal ${badge.trigger_value} kali olahraga`
           break
         case 'stock_items_count':
-          hint = `Miliki minimal ${badge.criteria_value} jenis bahan di stok Dapur`
+          hint = `Miliki minimal ${badge.trigger_value} jenis bahan di stok Dapur`
           break
       }
 

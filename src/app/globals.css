@@ -48,3 +48,11 @@ body {
   position: relative;
 }
 
+/* Bypass mobile frame constraint for admin area */
+.app-container:has(.admin-layout) {
+  max-width: 100% !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+  margin: 0 !important;
+}
+
