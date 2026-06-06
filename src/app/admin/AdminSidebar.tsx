@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Shield, LayoutDashboard, Award, BookOpen, Home } from 'lucide-react'
+import { Shield, LayoutDashboard, Award, BookOpen, Home, Tag, Users } from 'lucide-react'
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -15,16 +15,27 @@ export default function AdminSidebar() {
       icon: LayoutDashboard,
     },
     {
-      name: 'Kelola Badge & Reward',
-      href: '/admin/badges',
-      icon: Award,
+      name: 'Kelola Kategori',
+      href: '/admin/categories',
+      icon: Tag,
     },
     {
       name: 'Kelola Resep Starter',
       href: '/admin/resep',
       icon: BookOpen,
     },
+    {
+      name: 'Kelola Badge & Reward',
+      href: '/admin/badges',
+      icon: Award,
+    },
+    {
+      name: 'Manajemen User',
+      href: '/admin/users',
+      icon: Users,
+    },
   ]
+
 
   return (
     <aside className="flex flex-col w-64 bg-white text-text-secondary border-r border-border-subtle shrink-0 h-screen sticky top-0">

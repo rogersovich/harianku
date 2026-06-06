@@ -12,13 +12,26 @@ export async function POST(request: Request) {
 
     const { goal, skip } = await request.json()
 
-    // 1. Create Default Categories
-    const defaultCategories = [
-      { name: 'Sarapan Cepat', color: '#FFD93D', user_id: user.id },
-      { name: 'Masakan Berat', color: '#FF6B9D', user_id: user.id },
-      { name: 'Menu Diet', color: '#6BCB77', user_id: user.id },
-      { name: 'Favorit Keluarga', color: '#FF9A3C', user_id: user.id },
-    ]
+    // 1. Create Default Categories (Fetch from DB first)
+    let { data: defaultDbCats } = await supabase
+      .from('categories')
+      .select('*')
+      .is('user_id', null)
+
+    if (!defaultDbCats || defaultDbCats.length === 0) {
+      defaultDbCats = [
+        { name: 'Sarapan Cepat', color: '#FFD93D' },
+        { name: 'Masakan Berat', color: '#FF6B9D' },
+        { name: 'Menu Diet', color: '#6BCB77' },
+        { name: 'Favorit Keluarga', color: '#FF9A3C' },
+      ]
+    }
+
+    const defaultCategories = defaultDbCats.map((cat: any) => ({
+      name: cat.name,
+      color: cat.color,
+      user_id: user.id
+    }))
 
     const { data: categories, error: catError } = await supabase
       .from('categories')
@@ -30,10 +43,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: catError.message }, { status: 500 })
     }
 
-    const sarapanId = categories.find((c) => c.name === 'Sarapan Cepat')?.id
-    const beratId = categories.find((c) => c.name === 'Masakan Berat')?.id
-    const dietId = categories.find((c) => c.name === 'Menu Diet')?.id
-    const keluargaId = categories.find((c) => c.name === 'Favorit Keluarga')?.id
+    const sarapanId = categories.find((c) => c.name.toLowerCase().includes('sarapan'))?.id || categories[0]?.id
+    const beratId = categories.find((c) => c.name.toLowerCase().includes('berat') || c.name.toLowerCase().includes('siang') || c.name.toLowerCase().includes('malam'))?.id || categories[1]?.id || categories[0]?.id
+    const dietId = categories.find((c) => c.name.toLowerCase().includes('diet') || c.name.toLowerCase().includes('sehat'))?.id || categories[2]?.id || categories[0]?.id
+    const keluargaId = categories.find((c) => c.name.toLowerCase().includes('keluarga') || c.name.toLowerCase().includes('favorit'))?.id || categories[3]?.id || categories[0]?.id
+
 
     if (!skip && goal) {
       // 2. Define Starter Recipes
