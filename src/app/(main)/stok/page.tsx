@@ -75,6 +75,159 @@ export default function StockPage() {
   const [monthlyReport, setMonthlyReport] = useState<MonthlyReport | null>(null)
   const [loadingReport, setLoadingReport] = useState(false)
 
+  // Manual Shopping List states
+  const [manualShoppingList, setManualShoppingList] = useState<{ id: string; name: string; is_completed: boolean }[]>([])
+  const [newManualItemName, setNewManualItemName] = useState('')
+  const [loadingManualList, setLoadingManualList] = useState(false)
+
+  const fetchManualShoppingList = async () => {
+    setLoadingManualList(true)
+    try {
+      const res = await fetch('/api/belanja/manual')
+      const data = await res.json()
+      if (res.ok) {
+        setManualShoppingList(data)
+      } else {
+        toast.error(data.error || 'Gagal memuat daftar belanja manual')
+      }
+    } catch (err) {
+      toast.error('Masalah koneksi terganggu')
+    } finally {
+      setLoadingManualList(false)
+    }
+  }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const tabParam = params.get('tab')
+      if (tabParam === 'belanja') {
+        setActiveTab('belanja')
+      }
+    }
+    fetchManualShoppingList()
+  }, [])
+
+  const handleAddManualItem = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newManualItemName.trim()) return
+
+    try {
+      const res = await fetch('/api/belanja/manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newManualItemName.trim() })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setManualShoppingList(prev => [...prev, data])
+        setNewManualItemName('')
+        toast.success('Pengingat belanja ditambahkan! 📝')
+      } else {
+        toast.error(data.error || 'Gagal menambahkan item')
+      }
+    } catch (err) {
+      toast.error('Masalah koneksi')
+    }
+  }
+
+  const handleToggleManualItem = async (id: string, currentCompleted: boolean) => {
+    setManualShoppingList(prev => prev.map(item => 
+      item.id === id ? { ...item, is_completed: !currentCompleted } : item
+    ))
+
+    try {
+      const res = await fetch('/api/belanja/manual', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, is_completed: !currentCompleted })
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        toast.error(data.error || 'Gagal mengubah status item')
+        fetchManualShoppingList()
+      }
+    } catch (err) {
+      toast.error('Masalah koneksi')
+      fetchManualShoppingList()
+    }
+  }
+
+  const handleToggleAllManualItems = async () => {
+    const allCompleted = manualShoppingList.every(item => item.is_completed)
+    const targetCompleted = !allCompleted
+
+    setManualShoppingList(prev => prev.map(item => ({ ...item, is_completed: targetCompleted })))
+
+    try {
+      const res = await fetch('/api/belanja/manual', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_completed: targetCompleted, bulk: true })
+      })
+      if (res.ok) {
+        toast.success(allCompleted ? 'Batal mencentang semua item!' : 'Semua item berhasil dicentang! 🎉')
+      } else {
+        const data = await res.json()
+        toast.error(data.error || 'Gagal mengubah status masal')
+        fetchManualShoppingList()
+      }
+    } catch (err) {
+      toast.error('Masalah koneksi')
+      fetchManualShoppingList()
+    }
+  }
+
+  const handleDeleteManualItem = async (id: string) => {
+    setManualShoppingList(prev => prev.filter(item => item.id !== id))
+
+    try {
+      const res = await fetch('/api/belanja/manual', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      })
+      if (res.ok) {
+        toast.success('Item dihapus 🗑️')
+      } else {
+        const data = await res.json()
+        toast.error(data.error || 'Gagal menghapus item')
+        fetchManualShoppingList()
+      }
+    } catch (err) {
+      toast.error('Masalah koneksi')
+      fetchManualShoppingList()
+    }
+  }
+
+  const handleClearCompletedManualItems = async () => {
+    const completedItems = manualShoppingList.filter(item => item.is_completed)
+    if (completedItems.length === 0) {
+      toast.warning('Tidak ada item yang tercentang!')
+      return
+    }
+
+    setManualShoppingList(prev => prev.filter(item => !item.is_completed))
+
+    try {
+      const res = await fetch('/api/belanja/manual', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clear_completed: true })
+      })
+      if (res.ok) {
+        toast.success(`${completedItems.length} item belanja selesai dibersihkan! 🧹`)
+      } else {
+        const data = await res.json()
+        toast.error(data.error || 'Gagal membersihkan item')
+        fetchManualShoppingList()
+      }
+    } catch (err) {
+      toast.error('Masalah koneksi')
+      fetchManualShoppingList()
+    }
+  }
+
   const fetchStock = async () => {
     setLoading(true)
     try {
@@ -129,6 +282,7 @@ export default function StockPage() {
       fetchStock()
     } else if (activeTab === 'belanja') {
       fetchShoppingList()
+      fetchManualShoppingList()
     } else if (activeTab === 'laporan') {
       fetchReports()
     }
@@ -434,6 +588,105 @@ export default function StockPage() {
       {/* Tab: RESTOCK BELANJA */}
       {activeTab === 'belanja' && (
         <div className="space-y-4">
+          {/* Card Belanja Manual */}
+          <Card className="bg-amber-50/40 border-amber-200 shadow-xs p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-xs font-extrabold text-amber-800 flex items-center gap-1.5 uppercase tracking-wider">
+                  📝 Pengingat Belanja Pribadi
+                </h3>
+                <p className="text-[10px] text-amber-700/80 mt-0.5">Catat bahan makanan yang ingin kamu beli</p>
+              </div>
+              <span className="text-xl">🛒</span>
+            </div>
+
+            <form onSubmit={handleAddManualItem} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Misal: Susu coklat, wortel, telur... 🥛🥕🍳"
+                value={newManualItemName}
+                onChange={e => setNewManualItemName(e.target.value)}
+                className="flex-1 h-9 px-3 bg-white border border-border-subtle rounded-xl text-xs text-text-primary focus:outline-hidden focus:border-amber-400 transition-colors"
+              />
+              <button
+                type="submit"
+                className="px-4 h-9 bg-warning hover:bg-warning/80 text-white rounded-xl text-xs font-black transition-all active:scale-95 cursor-pointer flex items-center gap-1 shrink-0 shadow-xs"
+              >
+                <Plus className="w-4 h-4 stroke-[3px]" /> Tambah
+              </button>
+            </form>
+
+            {loadingManualList ? (
+              <div className="py-6 text-center text-text-secondary">
+                <RefreshCw className="w-6 h-6 text-warning animate-spin mx-auto mb-1" />
+                <p className="text-[10px] font-bold">Memperbarui catatan...</p>
+              </div>
+            ) : manualShoppingList.length > 0 ? (
+              <div className="space-y-3 pt-2">
+                <div className="flex justify-between items-center py-1 text-[10px] border-b border-border-subtle border-dashed pb-2">
+                  <button
+                    type="button"
+                    onClick={handleToggleAllManualItems}
+                    className="font-black text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    🌟 {manualShoppingList.every(item => item.is_completed) ? 'Batal Centang Semua' : 'Centang Semua'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleClearCompletedManualItems}
+                    className="font-black text-red-500 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    🧹 Bersihkan Tercentang
+                  </button>
+                </div>
+
+                <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
+                  {manualShoppingList.map((item) => (
+                    <div 
+                      key={item.id}
+                      className="flex items-center justify-between p-2.5 bg-white/95 rounded-xl border border-border-subtle hover:border-amber-300 transition-all group"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => handleToggleManualItem(item.id, item.is_completed)}
+                        className="flex-1 flex items-center gap-3 text-left focus:outline-hidden cursor-pointer"
+                      >
+                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors shrink-0 ${
+                          item.is_completed 
+                            ? 'bg-warning border-warning text-white' 
+                            : 'border-border-subtle bg-surface-alt'
+                        }`}>
+                          {item.is_completed && <Check className="w-3.5 h-3.5 stroke-[3px]" />}
+                        </div>
+                        <span className={`text-xs font-bold transition-all ${
+                          item.is_completed 
+                            ? 'text-text-disabled line-through italic decoration-warning decoration-2' 
+                            : 'text-text-primary'
+                        }`}>
+                          {item.name}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteManualItem(item.id)}
+                        className="p-1 text-text-secondary hover:text-red-500 rounded-lg opacity-60 md:opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                        title="Hapus"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="py-6 text-center text-text-secondary bg-white/40 border border-dashed border-border-subtle rounded-xl space-y-1">
+                <p className="text-xl">🥳</p>
+                <p className="text-xs font-bold text-text-primary">Catatan Belanja Kosong!</p>
+                <p className="text-[10px] text-text-secondary max-w-[200px] mx-auto">Tulis bahan belanjaan yang ingin kamu beli untuk pengingat.</p>
+              </div>
+            )}
+          </Card>
           <Card className="bg-amber-50/20 border-amber-200 p-3.5 flex gap-3 items-start">
             <Info className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
             <div>

@@ -83,9 +83,24 @@ export default function DashboardPage() {
     }
   }
 
+  const [manualShoppingList, setManualShoppingList] = useState<{ id: string; name: string; is_completed: boolean }[]>([])
+
+  const fetchManualShoppingList = async () => {
+    try {
+      const res = await fetch('/api/belanja/manual')
+      const json = await res.json()
+      if (res.ok) {
+        setManualShoppingList(json)
+      }
+    } catch (e) {
+      console.error('Gagal memuat daftar belanja manual di dashboard:', e)
+    }
+  }
+
   useEffect(() => {
     fetchDashboardData()
     setQuote(getRandomQuote())
+    fetchManualShoppingList()
   }, [])
 
   useEffect(() => {
@@ -307,6 +322,57 @@ export default function DashboardPage() {
           <span className="text-[10px] font-bold text-text-primary">Belanja</span>
         </Link>
       </section>
+
+      {/* Pengingat Belanja Section */}
+      {manualShoppingList.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex justify-between items-center">
+            <h2 className="text-sm font-bold text-text-primary flex items-center gap-1.5">
+              <span className="mr-1">🛒</span> Pengingat Belanja
+            </h2>
+            <Link 
+              href="/stok?tab=belanja" 
+              className="text-xs font-semibold text-warning flex items-center gap-0.5"
+            >
+              Kelola Belanjaan <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <Card className="bg-amber-50/20 border-amber-200/60 p-4 space-y-3.5">
+            <div className="space-y-2.5">
+              {manualShoppingList.slice(0, 5).map((item) => (
+                <div key={item.id} className="flex items-center gap-2.5 text-xs">
+                  <div className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors shrink-0 ${
+                    item.is_completed 
+                      ? 'bg-warning border-warning text-white' 
+                      : 'border-border-subtle bg-white'
+                  }`}>
+                    {item.is_completed && <Check className="w-3 h-3 stroke-[3px]" />}
+                  </div>
+                  <span className={`font-semibold ${
+                    item.is_completed 
+                      ? 'text-text-disabled line-through italic decoration-warning decoration-2' 
+                      : 'text-text-primary'
+                  }`}>
+                    {item.name}
+                  </span>
+                </div>
+              ))}
+              {manualShoppingList.length > 5 && (
+                <p className="text-[10px] text-text-secondary italic pl-6">
+                  + {manualShoppingList.length - 5} barang belanjaan lainnya...
+                </p>
+              )}
+            </div>
+
+            <Link href="/stok?tab=belanja" className="block w-full">
+              <button className="w-full h-9 bg-warning hover:bg-warning/80 text-white rounded-xl text-xs font-black transition-all active:scale-97 cursor-pointer flex items-center justify-center gap-1.5 shadow-pink-subtle">
+                Selesaikan Belanjaan di Stok ➡️
+              </button>
+            </Link>
+          </Card>
+        </section>
+      )}
 
       {/* Menu Hari Ini */}
       <section id="tour-menu" className="space-y-3">
